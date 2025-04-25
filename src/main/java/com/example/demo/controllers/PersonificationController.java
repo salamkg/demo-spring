@@ -27,10 +27,10 @@ public class PersonificationController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<?> checkMsisdn(@RequestParam String token, @RequestParam String msisdn) {
-        personificationService.checkMsisdn(token, msisdn);
-        return ResponseEntity.ok().build();
-    }
+//    @GetMapping
+//    public ResponseEntity<?> checkMsisdn(@RequestParam String token, @RequestParam String msisdn) {
+//        personificationService.checkMsisdn(token, msisdn);
+//        return ResponseEntity.ok().build();
+//    }
 
 }
