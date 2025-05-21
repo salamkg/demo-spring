@@ -16,7 +16,7 @@ public class PersonificationController {
     @Autowired
     private PersonificationService personificationService;
 
-    @PostMapping("createForIDCard")
+    @PostMapping("/createForIDCard")
     public ResponseEntity<PersonificationRequestResponse> createForIDCard(@RequestParam String token, @RequestParam String msisdn,
                                                           @RequestParam String pin, @RequestParam String firstName,
                                                           @RequestParam String passportSeries, @RequestParam String passportNumber,

@@ -30,10 +30,12 @@ public class InfocomServiceImpl implements InfocomService {
         model.put("number", passportNumber);
         log.info("Sending infocom passport data");
 
+        //microservice
         String infocomRequest = "data";
 
         Object responseJson = clientFeign.getPassportData(model, msisdn, infocomRequest);
         InfocomPassportData infocomPassportData = objectMapper.convertValue(responseJson, InfocomPassportData.class);
+        log.info("Infocom passport data received: {}", infocomPassportData);
 
         return infocomPassportData;
     }

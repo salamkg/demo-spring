@@ -27,7 +27,10 @@ public class PersonificationServiceImpl implements PersonificationService {
     public MsisdnCheckResponse checkMsisdn(String token, String msisdn) {
         checkSimMovement(token, msisdn);
 
-        return null;
+        return MsisdnCheckResponse.builder()
+                .message("Check Msisdn")
+                .subsId(1L)
+                .build();
     }
 
     @Override
@@ -37,6 +40,8 @@ public class PersonificationServiceImpl implements PersonificationService {
         checkMsisdn(token, msisdn);
 
         InfocomPassportData infocomPassportData = infocomService.getPassportData(msisdn, pin, passportSeries, passportNumber);
+
+
         return null;
     }
 
