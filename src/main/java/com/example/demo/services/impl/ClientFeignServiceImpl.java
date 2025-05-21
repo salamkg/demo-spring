@@ -9,6 +9,14 @@ import java.util.Map;
 public class ClientFeignServiceImpl implements ClientFeignService {
     @Override
     public Object getPassportData(Map<String, String> model, String msisdn, String source) {
-        return null;
+        model.put("pin", "21207201401054");
+        model.put("name", "John");
+        model.put("surname", "Doe");
+        model.put("gender", "M");
+        model.put("dateOfBirth", "2014-07-12");
+        model.put("passportSeries", "ID");
+        model.put("passportNumber", "0271404");
+        model.put("passportAuthority", "mkk");
+        return model;
     }
 }

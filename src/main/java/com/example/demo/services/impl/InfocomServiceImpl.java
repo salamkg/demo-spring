@@ -5,6 +5,7 @@ import com.example.demo.services.ClientFeign;
 import com.example.demo.services.ClientFeignService;
 import com.example.demo.services.InfocomService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.RetryableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +27,28 @@ public class InfocomServiceImpl implements InfocomService {
 
     @Override
     public InfocomPassportData getPassportData(String msisdn, String pin, String passportSeries, String passportNumber) {
-        Map<String, String> model = new HashMap<>();
-        model.put("pin", pin);
-        model.put("series", passportSeries);
-        model.put("number", passportNumber);
-        model.put("msisdn", msisdn);
-        log.info("Sending infocom passport data");
+        try {
+            Map<String, String> model = new HashMap<>();
+            model.put("pin", pin);
+            model.put("series", passportSeries);
+            model.put("number", passportNumber);
+            model.put("msisdn", msisdn);
+            log.info("Sending infocom passport data");
 
-        //microservice
-        String infocomRequest = "data";
+            //microservice
+            String infocomRequest = "infocomRequest";
 
-        Object responseJson = clientFeignService.getPassportData(model, msisdn, infocomRequest);
-        InfocomPassportData infocomPassportData = objectMapper.convertValue(responseJson, InfocomPassportData.class);
-        log.info("Infocom passport data received: {}", infocomPassportData);
+            Object responseJson = clientFeignService.getPassportData(model, msisdn, infocomRequest);
+            InfocomPassportData infocomPassportData = objectMapper.convertValue(responseJson, InfocomPassportData.class);
+            log.info("Infocom passport data received: {}", infocomPassportData);
 
-        return infocomPassportData;
+            return infocomPassportData;
+        } catch (RetryableException e) {
+            log.warn("Infocom PassportData timeout: {}", e.getMessage());
+            return null;
+        } catch (Exception e) {
+            log.warn("Exception while getting Infocom PassportData: {}", e.getMessage(), e);
+            return null;
+        }
     }
 }

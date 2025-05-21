@@ -65,6 +65,7 @@ public class PersonificationServiceImpl implements PersonificationService {
 
         InfocomPassportData infocomPassportData = infocomService.getPassportData(msisdn, pin, passportSeries, passportNumber);
         System.out.println(infocomPassportData);
+
         //Find Promoter By token
         PromoterSkppData promoterSkppData = promoterService.findPromoterFromSkppByToken(token);
         System.out.println(promoterSkppData);

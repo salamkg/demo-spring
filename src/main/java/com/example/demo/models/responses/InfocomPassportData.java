@@ -11,4 +11,9 @@ public class InfocomPassportData {
     private String pin;
     private String surname;
     private String name;
+    private String gender;
+    private String dateOfBirth;
+    private String passportSeries;
+    private String passportNumber;
+    private String passportAuthority;
 }
