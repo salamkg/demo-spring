@@ -5,7 +5,7 @@ import com.example.demo.models.responses.PersonificationRequestResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
+//@Service
 public interface PersonificationService {
     MsisdnCheckResponse checkMsisdn(String token, String msisdn);
 

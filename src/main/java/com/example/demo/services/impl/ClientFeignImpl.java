@@ -15,9 +15,11 @@ public class ClientFeignImpl implements ClientFeign {
         Map<String, String> passportData = new HashMap<>();
         passportData.put("msisdn", msisdn);
         passportData.put("source", source);
-        passportData.put("firstName", "John");
-        passportData.put("lastName", "Smith");
-        passportData.put("passportNumber", "AASDSAD2123");
+        passportData.put("firstName", model.get("firstName"));
+        passportData.put("lastName", model.get("lastName"));
+        passportData.put("passportNumber", model.get("passportNumber"));
+        passportData.put("passportSeries", model.get("passportSeries"));
+        passportData.put("pin", model.get("pin"));
 
         return passportData;
     }
