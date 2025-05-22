@@ -7,5 +7,5 @@ public interface BuilderService {
 
     SimMovement getSimMovement(String token, Long subsId);
 
-    PromoterSkppData getPromoterFromSkpp(String token);
+    PromoterSkppData getPromoterFromSkpp(String msisdn);
 }

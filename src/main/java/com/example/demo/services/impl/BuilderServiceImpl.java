@@ -1,5 +1,8 @@
 package com.example.demo.services.impl;
 
+import com.example.demo.dao.PromoterRepository;
+import com.example.demo.mappers.PromoterMapper;
+import com.example.demo.models.entities.Promoter;
 import com.example.demo.models.json.PromoterSkppData;
 import com.example.demo.models.responses.SimMovement;
 import com.example.demo.services.BuilderFeignService;
@@ -17,6 +20,10 @@ public class BuilderServiceImpl implements BuilderService {
     private BuilderFeignService builderFeignService;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private PromoterRepository promoterRepository;
+    @Autowired
+    private PromoterMapper promoterMapper;
 
     @Override
     public SimMovement getSimMovement(String token, Long subsId) {
@@ -24,13 +31,18 @@ public class BuilderServiceImpl implements BuilderService {
     }
 
     @Override
-    public PromoterSkppData getPromoterFromSkpp(String token) {
+    public PromoterSkppData getPromoterFromSkpp(String msisdn) {
+        // TODO getting promoter directly from DB
+        Promoter promoter = promoterRepository.findPromoterByMsisdn(msisdn);
+        PromoterSkppData promoterSkppData = promoterMapper.toPromoterSkppData(promoter);
+
+        // TODO no need
         Map<String, String> params = new HashMap<>();
         params.put("id", "79"); // retrieves id from microservice "${micro.megabuilder-service-v2.skpp-service-id}"
         params.put("action", "promoterSkppServiceAction");
-        params.put("token", token);
+        params.put("token", "token");
         Object responseJson = builderFeignService.doRequestModified(params);
-        PromoterSkppData promoterSkppData = objectMapper.convertValue(responseJson, PromoterSkppData.class);
+//        PromoterSkppData promoterSkppData = objectMapper.convertValue(responseJson, PromoterSkppData.class);
         return promoterSkppData;
     }
 }

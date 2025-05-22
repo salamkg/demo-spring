@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface PromoterRepository extends JpaRepository<Promoter, Long> {
     Optional<Promoter> findPromoterBySkppPromoterId(Long skppPromoterId);
+
+    Promoter findPromoterByMsisdn(String msisdn);
 }

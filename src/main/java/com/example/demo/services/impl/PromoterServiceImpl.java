@@ -26,12 +26,12 @@ public class PromoterServiceImpl implements PromoterService {
     private SupervisorService supervisorService;
 
     @Override
-    public PromoterSkppData findPromoterFromSkppByToken(String token) {
-        if (token == null || token.isEmpty()) {
-            throw new NullPointerException("token is null or empty");
+    public PromoterSkppData findPromoterFromSkppByMsisdn(String msisdn) {
+        if (msisdn == null || msisdn.isEmpty()) {
+            throw new NullPointerException("msisdn is null or empty");
         }
         try {
-            PromoterSkppData promoterSkppData = builderService.getPromoterFromSkpp(token);
+            PromoterSkppData promoterSkppData = builderService.getPromoterFromSkpp(msisdn);
             return promoterSkppData;
         } catch (Exception e) {
             throw new NoDataFoundException(e.getMessage());
