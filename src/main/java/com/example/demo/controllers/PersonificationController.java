@@ -2,11 +2,13 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.responses.PersonificationRequestResponse;
 import com.example.demo.services.PersonificationService;
+import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 
 @RestController
@@ -25,6 +27,13 @@ public class PersonificationController {
         PersonificationRequestResponse response = personificationService.createForIDCard(
                 token, msisdn, pin, firstName, passportSeries, passportNumber, documentOwner, passportFront, passportBack);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/scan-passport")
+    public ResponseEntity<?> scanPassport(@RequestParam("file") MultipartFile passportFile) {
+        String res = personificationService.scanPassport(passportFile);
+        System.out.println(res);
+        return ResponseEntity.ok().build();
     }
 
 //    @GetMapping

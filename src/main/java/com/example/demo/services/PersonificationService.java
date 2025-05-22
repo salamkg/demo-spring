@@ -2,8 +2,11 @@ package com.example.demo.services;
 
 import com.example.demo.models.responses.MsisdnCheckResponse;
 import com.example.demo.models.responses.PersonificationRequestResponse;
+import net.sourceforge.tess4j.TesseractException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 //@Service
 public interface PersonificationService {
@@ -12,4 +15,6 @@ public interface PersonificationService {
     PersonificationRequestResponse createForIDCard(String token, String msisdn, String pin, String firstName,
                                                    String passportSeries, String passportNumber, MultipartFile documentOwner,
                                                    MultipartFile passportFront, MultipartFile passportBack);
+
+    String scanPassport(MultipartFile passportFile);
 }

@@ -13,15 +13,22 @@ import com.example.demo.services.BuilderService;
 import com.example.demo.services.InfocomService;
 import com.example.demo.services.PersonificationService;
 import com.example.demo.services.PromoterService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -58,18 +65,52 @@ public class PersonificationServiceImpl implements PersonificationService {
     }
 
     @Override
+    public String scanPassport(MultipartFile file) {
+        try {
+            File convertFile = convertToFile(file);
+            Tesseract tesseract = new Tesseract();
+            tesseract.setDatapath("D:\\Users\\smadankulov\\IdeaProjects\\langs"); // путь к языковым моделям
+            tesseract.setLanguage("rus+eng");  // для распознавания рус+англ текста
+
+            return tesseract.doOCR(convertFile);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private File convertToFile(MultipartFile multipartFile) throws IOException {
+        File tempFile = File.createTempFile("upload-", ".jpg");
+        multipartFile.transferTo(tempFile);
+        return tempFile;
+    }
+
+    @Override
     public PersonificationRequestResponse createForIDCard(String token, String msisdn, String pin, String firstName,
                                                           String passportSeries, String passportNumber, MultipartFile documentOwner,
                                                           MultipartFile passportFront, MultipartFile passportBack) {
 //        checkMsisdn(token, msisdn);
-
         InfocomPassportData infocomPassportData = infocomService.getPassportData(msisdn, pin, passportSeries, passportNumber);
         System.out.println(infocomPassportData);
 
-        //Find Promoter By token
+        // Promoter
         PromoterSkppData promoterSkppData = promoterService.findPromoterFromSkppByToken(token);
+        PromoterDTO promoterDTO = promoterService.createPromoterFromSkppData(promoterSkppData);
         System.out.println(promoterSkppData);
         return null;
+    }
+
+    public Map<String, String> convertJsonToMap(String objStr) {
+        Map<String, String> params = new HashMap<>();
+        if (objStr != null) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                params = mapper.readValue(objStr, new TypeReference<>() {
+                });
+            } catch (Exception e) {
+                System.out.println("Error converting JSON to Map : " + e.getMessage());
+            }
+        }
+        return params;
     }
 
     public void checkSimMovement(String token, String msisdn) {
