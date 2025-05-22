@@ -8,23 +8,24 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.util.Date;
 
 @Entity
+@Builder
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Table(name = "promoters")
-public class Promoter {
+@AllArgsConstructor
+@Table(name = "supervisors")
+public class Supervisor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long supervisor_id;
 
-    @Column(name = "skpp_promoter_id")
-    private Long skppPromoterId;
+    private String dealer;
 
-    @Column(name = "promoter_name")
-    private String promoterName;
+    @Column(name = "skpp_supervisor_id")
+    private Long skppSupervisorId;
+
+    private String supervisor_name;
 
     @CreationTimestamp
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
@@ -36,14 +37,4 @@ public class Promoter {
 
     @Column(name = "subs_id")
     private Long subsId;
-
-    @Column(name = "inn")
-    private String inn;
-
-    @Column(name = "promoter_number")
-    private Long promoterNumber;
-
-    @ManyToOne
-    @JoinColumn(name = "supervisor_id")
-    private Supervisor supervisor;
 }
