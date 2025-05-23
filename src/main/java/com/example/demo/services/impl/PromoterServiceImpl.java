@@ -45,12 +45,12 @@ public class PromoterServiceImpl implements PromoterService {
         if (promoterSkppData == null) throw new PromoterException(promoterNotSavedMessage);
 
         try {
-            Optional<Promoter> promoterFromSkpp = promoterRepository.findPromoterBySkppPromoterId(promoterSkppData.getId());
+            Optional<Promoter> promoterFromSkpp = promoterRepository.findPromoterBySkppPromoterId(21L);
             if (promoterFromSkpp.isPresent()) {
                 Promoter promoter = promoterFromSkpp.get();
 
                 // Find Supervisor by Promoter Id
-                SupervisorSkppData supervisorSkppData = supervisorService.findSupervisorFromSkppByPromoterId(promoter.getSkppPromoterId());
+                SupervisorSkppData supervisorSkppData = supervisorService.findSupervisorFromSkppByPromoterId(promoter.getId());
                 SupervisorDTO supervisorDTO = supervisorService.createSupervisorFromSkppData(supervisorSkppData);
             }
 

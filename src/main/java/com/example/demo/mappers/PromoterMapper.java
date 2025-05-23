@@ -10,6 +10,7 @@ public class PromoterMapper {
     public PromoterSkppData toPromoterSkppData(Promoter promoter) {
         PromoterSkppData.PromoterSkppDataBuilder promoterSkppDataBuilder = PromoterSkppData.builder();
         return promoterSkppDataBuilder
+                .id(promoter.getId())
                 .inn(promoter.getInn())
                 .name(promoter.getPromoterName())
                 .msisdn(promoter.getMsisdn())

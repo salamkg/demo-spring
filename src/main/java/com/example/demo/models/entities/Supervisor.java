@@ -1,11 +1,13 @@
 package com.example.demo.models.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Builder
@@ -37,4 +39,8 @@ public class Supervisor {
 
     @Column(name = "subs_id")
     private Long subsId;
+
+    @OneToMany(mappedBy = "supervisor")
+    @JsonManagedReference
+    private List<Promoter> promoters;
 }

@@ -1,5 +1,6 @@
 package com.example.demo.models.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,7 +44,8 @@ public class Promoter {
     @Column(name = "promoter_number")
     private Long promoterNumber;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supervisor_id")
+    @JsonBackReference
     private Supervisor supervisor;
 }
