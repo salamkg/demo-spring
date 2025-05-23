@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.List;
 
 //@Service
 public interface PersonificationService {
@@ -14,7 +15,7 @@ public interface PersonificationService {
 
     PersonificationRequestResponse createForIDCard(String token, String msisdn, String pin, String firstName,
                                                    String passportSeries, String passportNumber, MultipartFile documentOwner,
-                                                   MultipartFile passportFront, MultipartFile passportBack);
+                                                   MultipartFile passportFront, MultipartFile passportBack, List<String> childNumbers, Long groupId);
 
     String scanPassport(MultipartFile passportFile);
 }

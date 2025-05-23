@@ -23,9 +23,10 @@ public class PersonificationController {
                                                           @RequestParam String pin, @RequestParam String firstName,
                                                           @RequestParam String passportSeries, @RequestParam String passportNumber,
                                                           @RequestParam MultipartFile documentOwner, @RequestParam MultipartFile passportFront,
-                                                          @RequestParam MultipartFile passportBack) {
+                                                          @RequestParam MultipartFile passportBack, @RequestParam(required = false) List<String> childNumbers,
+                                                          @RequestParam(required = false) Long groupId) {
         PersonificationRequestResponse response = personificationService.createForIDCard(
-                token, msisdn, pin, firstName, passportSeries, passportNumber, documentOwner, passportFront, passportBack);
+                token, msisdn, pin, firstName, passportSeries, passportNumber, documentOwner, passportFront, passportBack, childNumbers, groupId);
         return ResponseEntity.ok(response);
     }
 

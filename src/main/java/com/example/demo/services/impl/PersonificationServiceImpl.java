@@ -1,18 +1,18 @@
 package com.example.demo.services.impl;
 
 import com.example.demo.exceptions.MsisdnCheckException;
+import com.example.demo.mappers.PersonificationRequestMapper;
 import com.example.demo.models.dto.PersonificationRequestDTO;
 import com.example.demo.models.dto.PromoterDTO;
+import com.example.demo.models.entities.PersonificationRequest;
 import com.example.demo.models.enums.DocumentType;
 import com.example.demo.models.json.PromoterSkppData;
 import com.example.demo.models.responses.InfocomPassportData;
 import com.example.demo.models.responses.MsisdnCheckResponse;
 import com.example.demo.models.responses.PersonificationRequestResponse;
 import com.example.demo.models.responses.SimMovement;
-import com.example.demo.services.BuilderService;
-import com.example.demo.services.InfocomService;
-import com.example.demo.services.PersonificationService;
-import com.example.demo.services.PromoterService;
+import com.example.demo.repositories.PersonificationRequestRepository;
+import com.example.demo.services.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +40,12 @@ public class PersonificationServiceImpl implements PersonificationService {
     private InfocomService infocomService;
     @Autowired
     private PromoterService promoterService;
+    @Autowired
+    private PrePersonificationService prePersonificationService;
+    @Autowired
+    private PersonificationRequestMapper personificationRequestMapper;
+    @Autowired
+    private PersonificationRequestRepository personificationRequestRepository;
 
     @Override
     public MsisdnCheckResponse checkMsisdn(String token, String msisdn) {
@@ -51,17 +57,34 @@ public class PersonificationServiceImpl implements PersonificationService {
                 .build();
     }
 
+
+
     public PersonificationRequestDTO create(String msisdn, DocumentType documentType, PromoterDTO promoterDTO,
                                             List<String> childNumbers, Long groupId) {
+        Long subsId = 1L;
+//        Long subsId = prePersonificationService.getSubsIdByMsisdn(msisdn); // TODO this part not completed
+
         PersonificationRequestDTO personificationRequestDTO = new PersonificationRequestDTO();
         personificationRequestDTO.setMsisdn(msisdn);
-        personificationRequestDTO.setSubsId(1L);
+        personificationRequestDTO.setSubsId(subsId); // TODO static id
         personificationRequestDTO.setDocumentType(documentType);
         personificationRequestDTO.setPersonificationRequestUUId(UUID.randomUUID());
         personificationRequestDTO.setPromoterDTO(promoterDTO);
         personificationRequestDTO.setCreatDate(new Date());
 
+        personificationRequestDTO = save(personificationRequestDTO);
+
         return personificationRequestDTO;
+    }
+
+    private PersonificationRequestDTO save(PersonificationRequestDTO personificationRequestDTO) {
+        try {
+            PersonificationRequest personificationRequest = personificationRequestMapper.toPersonificationRequest(personificationRequestDTO);
+            PersonificationRequest savedPersonificationRequest = personificationRequestRepository.save(personificationRequest);
+            return personificationRequestMapper.toPersonificationRequestDTO(savedPersonificationRequest);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while saving personification request: " + e.getMessage());
+        }
     }
 
     @Override
@@ -87,15 +110,19 @@ public class PersonificationServiceImpl implements PersonificationService {
     @Override
     public PersonificationRequestResponse createForIDCard(String token, String msisdn, String pin, String firstName,
                                                           String passportSeries, String passportNumber, MultipartFile documentOwner,
-                                                          MultipartFile passportFront, MultipartFile passportBack) {
-//        checkMsisdn(token, msisdn);
+                                                          MultipartFile passportFront, MultipartFile passportBack, List<String> childNumbers,
+                                                          Long groupId) {
+//        checkMsisdn(token, msisdn); // TODO this part not completed
         InfocomPassportData infocomPassportData = infocomService.getPassportData(msisdn, pin, passportSeries, passportNumber);
         System.out.println(infocomPassportData);
 
-        // TODO Promoter by new -> msisdn, old -> token
+        // TODO Promoter by new -> msisdn, old -> token, this part not completed
         PromoterSkppData promoterSkppData = promoterService.findPromoterFromSkppByMsisdn(msisdn);
         PromoterDTO promoterDTO = promoterService.createPromoterFromSkppData(promoterSkppData);
         System.out.println(promoterSkppData);
+
+        // TODO Create Personification request
+        PersonificationRequestDTO personificationRequestDTO = create(msisdn, DocumentType.ID_CARD, promoterDTO, childNumbers, groupId);
         return null;
     }
 
