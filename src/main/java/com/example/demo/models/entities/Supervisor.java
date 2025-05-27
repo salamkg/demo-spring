@@ -27,7 +27,7 @@ public class Supervisor {
     @Column(name = "skpp_supervisor_id")
     private Long skppSupervisorId;
 
-    private String supervisor_name;
+    private String supervisorName;
 
     @CreationTimestamp
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
