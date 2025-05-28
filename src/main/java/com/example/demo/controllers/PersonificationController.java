@@ -1,7 +1,9 @@
 package com.example.demo.controllers;
 
 import com.example.demo.models.responses.PersonificationRequestResponse;
+import com.example.demo.models.responses.SendPersonificationDataResponse;
 import com.example.demo.services.PersonificationService;
+import com.example.demo.services.RequestProcessingService;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ public class PersonificationController {
 
     @Autowired
     private PersonificationService personificationService;
+    @Autowired
+    private RequestProcessingService requestProcessingService;
 
     @PostMapping("/createForIDCard")
     public ResponseEntity<PersonificationRequestResponse> createForIDCard(@RequestParam String token, @RequestParam String msisdn,
@@ -28,6 +32,13 @@ public class PersonificationController {
         PersonificationRequestResponse response = personificationService.createForIDCard(
                 token, msisdn, pin, firstName, passportSeries, passportNumber, documentOwner, passportFront, passportBack, childNumbers, groupId);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/submitRequest")
+    public ResponseEntity<?> submit(@RequestParam Long personificationRequestId, @RequestParam MultipartFile signature, @RequestParam String keyWord,
+                                    @RequestParam(required = false) String email, @RequestParam String promoterComment) {
+        SendPersonificationDataResponse sendPersonificationDataResponse = requestProcessingService.submitRequest(personificationRequestId, signature, keyWord, email, promoterComment);
+        return ResponseEntity.ok(sendPersonificationDataResponse);
     }
 
     @PostMapping("/scan-passport")

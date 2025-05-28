@@ -1,6 +1,7 @@
 package com.example.demo.services.impl;
 
 import com.example.demo.exceptions.MsisdnCheckException;
+import com.example.demo.exceptions.NoDataFoundException;
 import com.example.demo.mappers.PersonificationRequestMapper;
 import com.example.demo.models.dto.PersonificationRequestDTO;
 import com.example.demo.models.dto.PromoterDTO;
@@ -99,6 +100,16 @@ public class PersonificationServiceImpl implements PersonificationService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public PersonificationRequestDTO findById(Long personificationRequestId) {
+        if (personificationRequestId == null)
+            throw new NullPointerException("Error during PersonificationService::findById: personificationRequestId is null");
+
+        PersonificationRequest personificationRequest = personificationRequestRepository.findById(personificationRequestId)
+                .orElseThrow(() -> new NoDataFoundException("PersonificationRequest with id " + personificationRequestId + " not found"));
+        return personificationRequestMapper.toPersonificationRequestDTO(personificationRequest);
     }
 
     private File convertToFile(MultipartFile multipartFile) throws IOException {

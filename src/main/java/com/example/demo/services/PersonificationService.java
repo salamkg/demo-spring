@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.models.dto.PersonificationRequestDTO;
 import com.example.demo.models.responses.MsisdnCheckResponse;
 import com.example.demo.models.responses.PersonificationRequestResponse;
 import net.sourceforge.tess4j.TesseractException;
@@ -18,4 +19,6 @@ public interface PersonificationService {
                                                    MultipartFile passportFront, MultipartFile passportBack, List<String> childNumbers, Long groupId);
 
     String scanPassport(MultipartFile passportFile);
+
+    PersonificationRequestDTO findById(Long personificationRequestId);
 }
