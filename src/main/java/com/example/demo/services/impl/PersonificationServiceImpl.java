@@ -30,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -96,7 +98,37 @@ public class PersonificationServiceImpl implements PersonificationService {
             tesseract.setDatapath("D:\\Users\\smadankulov\\IdeaProjects\\langs"); // путь к языковым моделям
             tesseract.setLanguage("rus+eng");  // для распознавания рус+англ текста
 
-            return tesseract.doOCR(convertFile);
+            String result = tesseract.doOCR(convertFile);
+
+            result = result.replaceAll("\\s+", "");
+
+            Pattern pattern = Pattern.compile("IP\\w{28,}");
+            Matcher matcher = pattern.matcher(result);
+
+            if (matcher.find()) {
+                String rawData = matcher.group();
+
+                String countryCode = rawData.substring(2, 5); // KGZ
+                String passportSeries = rawData.substring(5, 7); // AN
+                String passportNumber = rawData.substring(7, 14); // 1234567
+                String genderCode = rawData.substring(15, 16); // 2 M
+                String gender = genderCode.equals("2") ? "M" : "Ж";
+                String birthDay = rawData.substring(16, 18); //01
+                String birthMonth = rawData.substring(18, 20); // 01
+                String birthYear = rawData.substring(20, 24); // 1991
+                String pin = rawData.substring(15, 29);
+
+                System.out.println("countryCode: " + countryCode + "\n"
+                        + "passportSeries: " + passportSeries + "\n"
+                        + "passportNumber: " + passportNumber + "\n"
+                        + "gender: " + gender + "\n"
+                        + "birthDay: " + birthDay + "\n"
+                        + "birthMonth: " + birthMonth + "\n"
+                        + "birthYear: " + birthYear + "\n"
+                        + "pin: " + pin + "\n");
+            }
+
+            return result;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

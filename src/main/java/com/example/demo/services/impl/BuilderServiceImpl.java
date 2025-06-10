@@ -36,7 +36,7 @@ public class BuilderServiceImpl implements BuilderService {
         Promoter promoter = promoterRepository.findPromoterByMsisdn(msisdn);
         PromoterSkppData promoterSkppData = promoterMapper.toPromoterSkppData(promoter);
 
-        // TODO no need
+        // TODO this part is not used
         Map<String, String> params = new HashMap<>();
         params.put("id", "79"); // retrieves id from microservice "${micro.megabuilder-service-v2.skpp-service-id}"
         params.put("action", "promoterSkppServiceAction");

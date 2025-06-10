@@ -38,7 +38,7 @@ public class InfocomServiceImpl implements InfocomService {
             //microservice
             String infocomRequest = "infocomRequest";
 
-            Object responseJson = clientFeignService.getPassportData(model, msisdn, infocomRequest);
+            Object responseJson = clientFeignService.getPassportData(model, msisdn, infocomRequest); // TODO response object made with static text
             InfocomPassportData infocomPassportData = objectMapper.convertValue(responseJson, InfocomPassportData.class);
             log.info("Infocom passport data received: {}", infocomPassportData);
 

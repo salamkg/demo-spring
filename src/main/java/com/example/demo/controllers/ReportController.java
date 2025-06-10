@@ -3,18 +3,15 @@ package com.example.demo.controllers;
 import com.example.demo.models.entities.sql.Order;
 import com.example.demo.models.entities.sql.OrderItem;
 import com.example.demo.models.entities.sql.User;
-import com.example.demo.models.enums.RequestStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +29,6 @@ public class ReportController {
         Root<User> user = cq.from(User.class);
         Join<User, Order> order = user.join("orders");
         Join<User, OrderItem> items = order.join("orderItems");
-        // ---------------------------------------------------------------------------------------------------
 
         cq.select(user)
                 .groupBy(user.get("id"))
