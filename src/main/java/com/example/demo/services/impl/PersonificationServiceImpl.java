@@ -7,6 +7,7 @@ import com.example.demo.models.dto.PersonificationRequestDTO;
 import com.example.demo.models.dto.PromoterDTO;
 import com.example.demo.models.entities.PersonificationRequest;
 import com.example.demo.models.enums.DocumentType;
+import com.example.demo.models.enums.RequestStatus;
 import com.example.demo.models.json.PromoterSkppData;
 import com.example.demo.models.responses.InfocomPassportData;
 import com.example.demo.models.responses.MsisdnCheckResponse;
@@ -15,15 +16,10 @@ import com.example.demo.models.responses.SimMovement;
 import com.example.demo.repositories.PersonificationRequestRepository;
 import com.example.demo.services.*;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,7 +34,7 @@ import java.util.regex.Pattern;
 public class PersonificationServiceImpl implements PersonificationService {
 
     @Autowired
-    private BuilderService builderService;
+    private MegaBuilderService megaBuilderService;
     @Autowired
     private InfocomService infocomService;
     @Autowired
@@ -49,6 +45,8 @@ public class PersonificationServiceImpl implements PersonificationService {
     private PersonificationRequestMapper personificationRequestMapper;
     @Autowired
     private PersonificationRequestRepository personificationRequestRepository;
+    @Autowired
+    private PersonificationService personificationService;
 
     @Override
     public MsisdnCheckResponse checkMsisdn(String token, String msisdn) {
@@ -155,17 +153,64 @@ public class PersonificationServiceImpl implements PersonificationService {
                                                           String passportSeries, String passportNumber, MultipartFile documentOwner,
                                                           MultipartFile passportFront, MultipartFile passportBack, List<String> childNumbers,
                                                           Long groupId) {
-//        checkMsisdn(token, msisdn); // TODO this part not completed
+        // Проверка номера на наличие заявок, категорию регистрации и на передачу промоутеру супервайзером
+        prePersonificationService.checkMsisdn(token, 1, msisdn);
+
+        // Получение данных из инфокома
         InfocomPassportData infocomPassportData = infocomService.getPassportData(msisdn, pin, passportSeries, passportNumber);
-        System.out.println(infocomPassportData);
+        // Сличение фото
 
-        // TODO Promoter by new -> msisdn, old -> token, this part not completed
-        PromoterSkppData promoterSkppData = promoterService.findPromoterFromSkppByMsisdn(msisdn);
+        // Поиск промоутера в оракловой базе по токену
+        PromoterSkppData promoterSkppData = promoterService.findPromoterFromSkppByToken(msisdn);
+        // Создание промоутера из данных скпп
         PromoterDTO promoterDTO = promoterService.createPromoterFromSkppData(promoterSkppData);
-        System.out.println(promoterSkppData);
 
-        // TODO Create Personification request
+        // Формирование заявки
         PersonificationRequestDTO personificationRequestDTO = create(msisdn, DocumentType.ID_CARD, promoterDTO, childNumbers, groupId);
+
+        // Формирование details с фотками
+
+        // Ищем созданную заявку в таблице tb_infocom_responses
+
+        // Если данные инфокома null, то отправляем на ручное заполнение
+        // Если данные инфокома есть, ставим флажок и снова пересохраняем
+
+        // Если !infocomResponseDTO.isPassportDataChecked()
+        // то данные пустые и отправка на ручное заполнение
+
+        // !infocomResponseDTO.isInfocomPassportActive()
+        // то срок паспорта истек
+
+        // формируем passportInfo из данных инфокома
+
+        // Создание CreatePersonificationRequestResponse
+
+        return null;
+    }
+
+    @Override
+    public PersonificationRequestResponse createForOtherDoc(String token, String msisdn, String surname, String name,
+                                                            String middleName, Date dateOfBirth, String passportSeries,
+                                                            String passportNumber, String pin, String organization,
+                                                            Date issueDate, String gender, DocumentType documentType,
+                                                            MultipartFile documentFront, MultipartFile documentBack,
+                                                            MultipartFile documentOwner, List<String> childNumbers,
+                                                            Long groupId, int langId) {
+        // Проверка номера на наличие заявок, категорию регистрации и на передачу промоутеру супервайзером
+        prePersonificationService.checkMsisdn(token, 1, msisdn);
+
+        // Поиск промоутера в оракловой базе по токену
+        PromoterSkppData promoterSkppData = promoterService.findPromoterFromSkppByToken(msisdn);
+        // Создание промоутера из данных скпп
+        PromoterDTO promoterDTO = promoterService.createPromoterFromSkppData(promoterSkppData);
+
+        // Формирование заявки
+        PersonificationRequestDTO personificationRequestDTO = create(msisdn, documentType, promoterDTO, childNumbers, groupId);
+
+        // Формирование details с фотками
+
+        // Создание CreatePersonificationRequestResponse
+
         return null;
     }
 
@@ -186,7 +231,7 @@ public class PersonificationServiceImpl implements PersonificationService {
     public void checkSimMovement(String token, String msisdn) {
         if (token != null && !token.isEmpty()) {
             Long subsId = 1L;
-            SimMovement simMovement = builderService.getSimMovement(token, subsId);
+            SimMovement simMovement = megaBuilderService.getSimMovement(token, subsId);
             if (simMovement.getCode() == 0) {
                 log.error("SimMovement for msisdn = {}: {}", msisdn, simMovement);
                 throw new MsisdnCheckException("Msisdn is not assigned to promoter");
@@ -194,6 +239,12 @@ public class PersonificationServiceImpl implements PersonificationService {
         } else {
             throw new NullPointerException("Token is empty");
         }
+    }
+
+    @Override
+    public int countPassedRequestsBySubs(Long subsId) {
+        List<RequestStatus> passed = List.of(RequestStatus.NEW, RequestStatus.IN_PROCESS, RequestStatus.APPROVED, RequestStatus.PROCESSED, RequestStatus.ERROR);
+        return personificationRequestRepository.countBySubsIdAndStatuses(subsId, passed);
     }
 
 }

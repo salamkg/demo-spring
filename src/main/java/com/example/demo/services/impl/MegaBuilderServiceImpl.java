@@ -4,9 +4,10 @@ import com.example.demo.dao.PromoterRepository;
 import com.example.demo.mappers.PromoterMapper;
 import com.example.demo.models.entities.Promoter;
 import com.example.demo.models.json.PromoterSkppData;
+import com.example.demo.models.json.SubscriberProfile;
 import com.example.demo.models.responses.SimMovement;
 import com.example.demo.services.BuilderFeignService;
-import com.example.demo.services.BuilderService;
+import com.example.demo.services.MegaBuilderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class BuilderServiceImpl implements BuilderService {
+public class MegaBuilderServiceImpl implements MegaBuilderService {
     @Autowired
     private BuilderFeignService builderFeignService;
     @Autowired
@@ -44,5 +45,18 @@ public class BuilderServiceImpl implements BuilderService {
         Object responseJson = builderFeignService.doRequestModified(params);
 //        PromoterSkppData promoterSkppData = objectMapper.convertValue(responseJson, PromoterSkppData.class);
         return promoterSkppData;
+    }
+
+    @Override
+    public SubscriberProfile getSubscriberProfile(String msisdn) {
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("id", "10");
+            params.put("msisdn", msisdn);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
     }
 }

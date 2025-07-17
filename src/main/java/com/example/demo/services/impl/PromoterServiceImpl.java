@@ -8,7 +8,7 @@ import com.example.demo.models.dto.SupervisorDTO;
 import com.example.demo.models.entities.Promoter;
 import com.example.demo.models.json.PromoterSkppData;
 import com.example.demo.models.json.SupervisorSkppData;
-import com.example.demo.services.BuilderService;
+import com.example.demo.services.MegaBuilderService;
 import com.example.demo.services.PromoterService;
 import com.example.demo.services.SupervisorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +19,19 @@ import java.util.Optional;
 @Service
 public class PromoterServiceImpl implements PromoterService {
     @Autowired
-    private BuilderService builderService;
+    private MegaBuilderService megaBuilderService;
     @Autowired
     private PromoterRepository promoterRepository;
     @Autowired
     private SupervisorService supervisorService;
 
     @Override
-    public PromoterSkppData findPromoterFromSkppByMsisdn(String msisdn) {
+    public PromoterSkppData findPromoterFromSkppByToken(String msisdn) {
         if (msisdn == null || msisdn.isEmpty()) {
             throw new NullPointerException("msisdn is null or empty");
         }
         try {
-            PromoterSkppData promoterSkppData = builderService.getPromoterFromSkpp(msisdn);
+            PromoterSkppData promoterSkppData = megaBuilderService.getPromoterFromSkpp(msisdn);
             return promoterSkppData;
         } catch (Exception e) {
             throw new NoDataFoundException(e.getMessage());
